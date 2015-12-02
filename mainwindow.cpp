@@ -16,8 +16,6 @@ MainWindow::MainWindow(QWidget *parent) :
         connect(ui->pushButton_edit_user,SIGNAL(clicked()),SLOT(edit_user()));
         connect(ui->pushButton_del_user,SIGNAL(clicked()),SLOT(del_user()));
         connect(ui->pushButton_add_right,SIGNAL(clicked()),SLOT(add_user_right()));
-        connect(ui->pushButton_edit_right,SIGNAL(clicked()),SLOT(edit_user_right()));
-        connect(ui->pushButton_del_right,SIGNAL(clicked()),SLOT(del_user_right()));
         connect(ui->pushButton_tasks,SIGNAL(clicked()),SLOT(view_tasks()));
         connect(timer_tasks,SIGNAL(timeout()),this,SLOT(get_count_tasks()));
         connect(ui->treeWidget,SIGNAL(itemChanged(QTreeWidgetItem*,int)),SLOT(checkedItemTree(QTreeWidgetItem*,int)));
@@ -48,23 +46,23 @@ void MainWindow::checkedItemTree(QTreeWidgetItem * item, int column)
 
 void MainWindow::settings_ui()
 {
-     QTableWidget* roleTable = ui->tableWidget_role;
-     QTableWidgetItem * name_1_collumn_role = new QTableWidgetItem();
-     QTableWidgetItem * name_2_collumn_role = new QTableWidgetItem();
-     QTableWidgetItem * name_3_collumn_role = new QTableWidgetItem();
-     QTableWidgetItem * name_4_collumn_role = new QTableWidgetItem();
-     roleTable->setColumnCount(4);
-     roleTable->setColumnWidth(0,100);
-     roleTable->setColumnWidth(1,100);
-     name_1_collumn_role->setText("Номер");
-     name_2_collumn_role->setText("Имя пользователя");
-     name_3_collumn_role->setText("Логин");
-     name_4_collumn_role->setText("Статус");
-     roleTable->setHorizontalHeaderItem(0,name_1_collumn_role);
-     roleTable->setHorizontalHeaderItem(1,name_2_collumn_role);
-     roleTable->setHorizontalHeaderItem(2,name_3_collumn_role);
-     roleTable->setHorizontalHeaderItem(3,name_4_collumn_role);
-     get_users();
+    QTableWidget* roleTable = ui->tableWidget_role;
+    QTableWidgetItem * name_1_collumn_role = new QTableWidgetItem();
+    QTableWidgetItem * name_2_collumn_role = new QTableWidgetItem();
+    QTableWidgetItem * name_3_collumn_role = new QTableWidgetItem();
+    QTableWidgetItem * name_4_collumn_role = new QTableWidgetItem();
+    roleTable->setColumnCount(4);
+    roleTable->setColumnWidth(0,100);
+    roleTable->setColumnWidth(1,100);
+    name_1_collumn_role->setText("Номер");
+    name_2_collumn_role->setText("Имя пользователя");
+    name_3_collumn_role->setText("Логин");
+    name_4_collumn_role->setText("Статус");
+    roleTable->setHorizontalHeaderItem(0,name_1_collumn_role);
+    roleTable->setHorizontalHeaderItem(1,name_2_collumn_role);
+    roleTable->setHorizontalHeaderItem(2,name_3_collumn_role);
+    roleTable->setHorizontalHeaderItem(3,name_4_collumn_role);
+    get_users();
 }
 void MainWindow::get_users()
 {
@@ -121,6 +119,9 @@ void MainWindow::get_users()
 void MainWindow::get_user_right()
 {
     ui->treeWidget->clear();
+    ui->treeWidget->setColumnWidth(0,200);
+    QSqlDatabase db = QSqlDatabase::database();
+    QSqlQuery query;
     QTreeWidgetItem *group_patients_rights =new QTreeWidgetItem();
     QTreeWidgetItem *add_patients = new QTreeWidgetItem();
     QTreeWidgetItem *edit_patients = new QTreeWidgetItem();
@@ -237,7 +238,124 @@ void MainWindow::get_user_right()
     group_control_pos_rights->addChild(edit_control_pos);
     group_control_pos_rights->addChild(del_control_pos);
     group_control_pos_rights->addChild(add_today_control_pos);
+    int selected_tables = ui->tableWidget_role->selectionModel()->selectedRows().count();
+    if (selected_tables == 1)
+    {
+        int cu_row = ui->tableWidget_role->currentRow();
+        QString id_user = ui->tableWidget_role->item(cu_row,0)->text();
+        qDebug()<<id_user;
+        QString str_query = "SELECT\
+                rights.insert_patients,\
+                rights.delete_patients,\
+                rights.update_patients,\
+                rights.add_dynamic_view,\
+                rights.edit_dynamic_view,\
+                rights.del_dynamic_view,\
+                rights.add_visits,\
+                rights.edit_visits,\
+                rights.del_visits,\
+                rights.add_today_visits\
+                FROM\
+                test.rights\
+                WHERE\
+                rights.user_id=";
 
+        if (db.open())
+        {
+            query.exec(str_query.append(id_user));
+
+            while (query.next())
+            {
+                qDebug()<<query.value(0)<<query.value(1)<<query.value(2)<<query.value(3)<<query.value(4)<<query.value(5)<<query.value(6)<<query.value(7)<<query.value(8)<<query.value(9);
+                if(query.value(0).toBool())
+                {
+                    add_patients->setCheckState(0,Qt::Checked);
+
+                }
+                else
+                {
+                    add_patients->setCheckState(0,Qt::Unchecked);
+                }
+                if(query.value(1).toBool())
+                {
+                    edit_patients->setCheckState(0,Qt::Checked);
+
+                }
+                else
+                {
+                    edit_patients->setCheckState(0,Qt::Unchecked);
+                }
+                if(query.value(2).toBool())
+                {
+                    del_patients->setCheckState(0,Qt::Checked);
+                }
+                else
+                {
+                    del_patients->setCheckState(0,Qt::Unchecked);
+                }
+                if(query.value(3).toBool())
+                {
+                    add_dynamic_view->setCheckState(0,Qt::Checked);
+
+                }
+                else
+                {
+                    add_dynamic_view->setCheckState(0,Qt::Unchecked);
+                }
+                if(query.value(4).toBool())
+                {
+                    edit_dynamic_view->setCheckState(0,Qt::Checked);
+
+                }
+                else
+                {
+                    edit_dynamic_view->setCheckState(0,Qt::Unchecked);
+                }
+                if(query.value(5).toBool())
+                {
+                    del_dynamic_view->setCheckState(0,Qt::Checked);
+                }
+                else
+                {
+                    del_dynamic_view->setCheckState(0,Qt::Unchecked);
+                }
+                if(query.value(6).toBool())
+                {
+                    add_control_pos->setCheckState(0,Qt::Checked);
+
+                }
+                else
+                {
+                    add_control_pos->setCheckState(0,Qt::Unchecked);
+                }
+                if(query.value(7).toBool())
+                {
+                    edit_control_pos->setCheckState(0,Qt::Checked);
+
+                }
+                else
+                {
+                    edit_control_pos->setCheckState(0,Qt::Unchecked);
+                }
+                if(query.value(8).toBool())
+                {
+                    del_control_pos->setCheckState(0,Qt::Checked);
+                }
+                else
+                {
+                    del_control_pos->setCheckState(0,Qt::Unchecked);
+                }
+                if(query.value(9).toBool())
+                {
+                    add_today_control_pos->setCheckState(0,Qt::Checked);
+                }
+                else
+                {
+                    add_today_control_pos->setCheckState(0,Qt::Unchecked);
+                }
+            }
+        }
+    }
 }
 void MainWindow::clear_users_table()
 {
@@ -285,7 +403,7 @@ void MainWindow::del_user()
         Dialog_delete_user dialog;
         dialog.setParam(id_user,user_name);
         dialog.exec();
-}
+    }
 }
 void MainWindow::add_user_right()
 {
@@ -319,7 +437,7 @@ void MainWindow::get_count_tasks()
         query.exec("SELECT COUNT(id) FROM test.logs WHERE date_add='"+QDate::currentDate().toString("MM.dd.yyyy")+"';");
         while(query.next())
         {
-           task_count = query.value(0).toString();
+            task_count = query.value(0).toString();
         }
         ui->pushButton_tasks->setText("Сегодня добавлено или обновленно "+task_count);
     }
