@@ -65,6 +65,7 @@ void MainWindow::get_users()
     int last_row = ui->tableWidget_role->rowCount();
     if (db.open())
     {
+
         ui->statusBar->showMessage("подключенно");
         QSqlQuery query1;
         QString sqlquery;
