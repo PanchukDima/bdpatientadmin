@@ -31,10 +31,18 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::checkedItemTree(QTreeWidgetItem * itemcheck, int i)
+void MainWindow::checkedItemTree(QTreeWidgetItem * item, int column)
 {
-    qDebug()<<itemcheck->checkState(i);
-    qDebug()<<itemcheck->childIndicatorPolicy();
+    if(column != 0)
+        return;
+
+
+    Qt::CheckState checkState = item->checkState(0);
+    for(int i = 0; i < item->childCount(); ++i)
+    {
+        item->child(i)->setCheckState(0, checkState);
+
+    }
 
 }
 
@@ -112,10 +120,20 @@ void MainWindow::get_users()
 }
 void MainWindow::get_user_right()
 {
+    ui->treeWidget->clear();
     QTreeWidgetItem *group_patients_rights =new QTreeWidgetItem();
     QTreeWidgetItem *add_patients = new QTreeWidgetItem();
     QTreeWidgetItem *edit_patients = new QTreeWidgetItem();
     QTreeWidgetItem *del_patients = new QTreeWidgetItem();
+    QTreeWidgetItem *group_dynamic_view_rights =new QTreeWidgetItem();
+    QTreeWidgetItem *add_dynamic_view = new QTreeWidgetItem();
+    QTreeWidgetItem *edit_dynamic_view = new QTreeWidgetItem();
+    QTreeWidgetItem *del_dynamic_view = new QTreeWidgetItem();
+    QTreeWidgetItem *group_control_pos_rights =new QTreeWidgetItem();
+    QTreeWidgetItem *add_control_pos = new QTreeWidgetItem();
+    QTreeWidgetItem *edit_control_pos = new QTreeWidgetItem();
+    QTreeWidgetItem *del_control_pos = new QTreeWidgetItem();
+    QTreeWidgetItem *add_today_control_pos = new QTreeWidgetItem();
 
     group_patients_rights->setText(0,tr("Работа с пациентами"));
     group_patients_rights->setText(1,tr("Добавлять, Изменять, Удалять"));
@@ -123,11 +141,39 @@ void MainWindow::get_user_right()
     edit_patients->setText(0,tr("Изменять Пациента"));
     del_patients->setText(0,tr("Удалять Пациента"));
 
+    group_dynamic_view_rights->setText(0,tr("Работа с Таблицей Динамика наблюдения"));
+    group_dynamic_view_rights->setText(1,tr("Добавлять, Изменять, Удалять"));
+    add_dynamic_view->setText(0,tr("Добавлять Динамику наблюдения"));
+    edit_dynamic_view->setText(0,tr("Изменять Динамику наблюдения"));
+    del_dynamic_view->setText(0,tr("Удалять Динамику наблюдения"));
+
+
+    group_control_pos_rights->setText(0,tr("Работа с Таблицей Контроль посещений"));
+    group_control_pos_rights->setText(1,tr("Добавлять, Изменять, Удалять, Пришел сегодня"));
+    add_control_pos->setText(0,tr("Добавлять Контроль посещений"));
+    edit_control_pos->setText(0,tr("Изменять Контроль посещений"));
+    del_control_pos->setText(0,tr("Удалять Контроль посещений"));
+    add_today_control_pos->setText(0,tr("Метка Пришел сегодня"));
+
     group_patients_rights->setFlags(group_patients_rights->flags() | Qt::ItemIsUserCheckable);
     group_patients_rights->setCheckState(0,Qt::Checked);
     add_patients->setFlags(add_patients->flags() | Qt::ItemIsUserCheckable);
     edit_patients->setFlags(edit_patients->flags() | Qt::ItemIsUserCheckable);
     del_patients->setFlags(del_patients->flags() | Qt::ItemIsUserCheckable);
+
+    group_dynamic_view_rights->setFlags(group_dynamic_view_rights->flags() | Qt::ItemIsUserCheckable);
+    group_dynamic_view_rights->setCheckState(0,Qt::Checked);
+    add_dynamic_view->setFlags(add_patients->flags() | Qt::ItemIsUserCheckable);
+    edit_dynamic_view->setFlags(edit_patients->flags() | Qt::ItemIsUserCheckable);
+    del_dynamic_view->setFlags(del_patients->flags() | Qt::ItemIsUserCheckable);
+
+    group_control_pos_rights->setFlags(group_control_pos_rights->flags() | Qt::ItemIsUserCheckable);
+    group_control_pos_rights->setCheckState(0,Qt::Checked);
+    add_control_pos->setFlags(add_control_pos->flags() | Qt::ItemIsUserCheckable);
+    edit_control_pos->setFlags(edit_control_pos->flags() | Qt::ItemIsUserCheckable);
+    del_control_pos->setFlags(del_control_pos->flags() | Qt::ItemIsUserCheckable);
+    add_today_control_pos->setFlags(del_control_pos->flags() | Qt::ItemIsUserCheckable);
+
     if(group_patients_rights->checkState(0))
     {
 
@@ -142,11 +188,55 @@ void MainWindow::get_user_right()
         edit_patients->setCheckState(0,Qt::Unchecked);
         del_patients->setCheckState(0,Qt::Unchecked);
     }
-    qDebug()<<group_patients_rights->checkState(0);
+
+    if(group_dynamic_view_rights->checkState(0))
+    {
+
+        add_dynamic_view->setCheckState(0,Qt::Checked);
+        edit_dynamic_view->setCheckState(0,Qt::Checked);
+        del_dynamic_view->setCheckState(0,Qt::Checked);
+    }
+    else
+    {
+
+        add_dynamic_view->setCheckState(0,Qt::Unchecked);
+        edit_dynamic_view->setCheckState(0,Qt::Unchecked);
+        del_dynamic_view->setCheckState(0,Qt::Unchecked);
+    }
+
+    if(group_control_pos_rights->checkState(0))
+    {
+
+        add_control_pos->setCheckState(0,Qt::Checked);
+        edit_control_pos->setCheckState(0,Qt::Checked);
+        del_control_pos->setCheckState(0,Qt::Checked);
+        add_today_control_pos->setCheckState(0,Qt::Checked);
+    }
+    else
+    {
+
+        add_control_pos->setCheckState(0,Qt::Unchecked);
+        edit_control_pos->setCheckState(0,Qt::Unchecked);
+        del_control_pos->setCheckState(0,Qt::Unchecked);
+        add_today_control_pos->setCheckState(0,Qt::Unchecked);
+    }
+
+
     ui->treeWidget->addTopLevelItem(group_patients_rights);
     group_patients_rights->addChild(add_patients);
     group_patients_rights->addChild(edit_patients);
     group_patients_rights->addChild(del_patients);
+
+    ui->treeWidget->addTopLevelItem(group_dynamic_view_rights);
+    group_dynamic_view_rights->addChild(add_dynamic_view);
+    group_dynamic_view_rights->addChild(edit_dynamic_view);
+    group_dynamic_view_rights->addChild(del_dynamic_view);
+
+    ui->treeWidget->addTopLevelItem(group_control_pos_rights);
+    group_control_pos_rights->addChild(add_control_pos);
+    group_control_pos_rights->addChild(edit_control_pos);
+    group_control_pos_rights->addChild(del_control_pos);
+    group_control_pos_rights->addChild(add_today_control_pos);
 
 }
 void MainWindow::clear_users_table()

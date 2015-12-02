@@ -33,7 +33,7 @@ public slots:
     void get_users();
     void settings_ui();
     void get_user_right();
-    void checkedItemTree(QTreeWidgetItem*,int);
+    void checkedItemTree(QTreeWidgetItem*, int column);
     void clear_users_table();
     void add_user();
     void edit_user();

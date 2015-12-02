@@ -84,21 +84,27 @@
       <item>
        <widget class="QPushButton" name="pushButton_add_right">
         <property name="text">
-         <string>Добавить права</string>
+         <string>Сохранить</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QPushButton" name="pushButton_edit_right">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="text">
-         <string>Изменить права</string>
+         <string/>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QPushButton" name="pushButton_del_right">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="text">
-         <string>Удалить права</string>
+         <string/>
         </property>
        </widget>
       </item>
