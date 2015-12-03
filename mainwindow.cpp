@@ -405,28 +405,7 @@ void MainWindow::del_user()
         dialog.exec();
     }
 }
-void MainWindow::add_user_right()
-{
 
-}
-void MainWindow::edit_user_right()
-{
-
-}
-void MainWindow::del_user_right()
-{
-    int selected_tables = ui->tableWidget_role->selectionModel()->selectedRows().count();
-    if (selected_tables == 1)
-    {
-        int cu_row = ui->tableWidget_role->currentRow();
-        QString id_user = ui->tableWidget_role->item(cu_row,0)->text();
-        QString user_name = ui->tableWidget_role->item(cu_row,1)->text();
-        Dialog_delete_user_right dialog;
-        dialog.setParam(id_user,user_name);
-        dialog.exec();
-    }
-
-}
 void MainWindow::get_count_tasks()
 {
     QSqlDatabase db = QSqlDatabase::database();
