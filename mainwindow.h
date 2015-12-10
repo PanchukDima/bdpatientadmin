@@ -12,6 +12,7 @@
 #include <QTimer>
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
+#include <QStandardItemModel>
 
 namespace Ui {
 class MainWindow;
@@ -38,9 +39,7 @@ public slots:
     void add_user();
     void edit_user();
     void del_user();
-    void add_user_right();
-    void edit_user_right();
-    void del_user_right();
+    void save_user_right();
     void get_count_tasks();
     void view_tasks();
 };

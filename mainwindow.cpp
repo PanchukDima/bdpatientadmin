@@ -15,7 +15,7 @@ MainWindow::MainWindow(QWidget *parent) :
         connect(ui->pushButton_add_user,SIGNAL(clicked()),SLOT(add_user()));
         connect(ui->pushButton_edit_user,SIGNAL(clicked()),SLOT(edit_user()));
         connect(ui->pushButton_del_user,SIGNAL(clicked()),SLOT(del_user()));
-        connect(ui->pushButton_add_right,SIGNAL(clicked()),SLOT(add_user_right()));
+        connect(ui->pushButton_add_right,SIGNAL(clicked()),SLOT(save_user_right()));
         connect(ui->pushButton_tasks,SIGNAL(clicked()),SLOT(view_tasks()));
         connect(timer_tasks,SIGNAL(timeout()),this,SLOT(get_count_tasks()));
         connect(ui->treeWidget,SIGNAL(itemChanged(QTreeWidgetItem*,int)),SLOT(checkedItemTree(QTreeWidgetItem*,int)));
@@ -32,9 +32,7 @@ MainWindow::~MainWindow()
 void MainWindow::checkedItemTree(QTreeWidgetItem * item, int column)
 {
     if(column != 0)
-        return;
-
-
+    return;
     Qt::CheckState checkState = item->checkState(0);
     for(int i = 0; i < item->childCount(); ++i)
     {
@@ -119,6 +117,7 @@ void MainWindow::get_users()
 void MainWindow::get_user_right()
 {
     ui->treeWidget->clear();
+    ui->pushButton_add_right->setEnabled(true);
     ui->treeWidget->setColumnWidth(0,200);
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query;
@@ -278,20 +277,20 @@ void MainWindow::get_user_right()
                 }
                 if(query.value(1).toBool())
                 {
-                    edit_patients->setCheckState(0,Qt::Checked);
+                    del_patients->setCheckState(0,Qt::Checked);
 
                 }
                 else
                 {
-                    edit_patients->setCheckState(0,Qt::Unchecked);
+                    del_patients->setCheckState(0,Qt::Unchecked);
                 }
                 if(query.value(2).toBool())
                 {
-                    del_patients->setCheckState(0,Qt::Checked);
+                    edit_patients->setCheckState(0,Qt::Checked);
                 }
                 else
                 {
-                    del_patients->setCheckState(0,Qt::Unchecked);
+                    edit_patients->setCheckState(0,Qt::Unchecked);
                 }
                 if(query.value(3).toBool())
                 {
@@ -353,10 +352,144 @@ void MainWindow::get_user_right()
                 {
                     add_today_control_pos->setCheckState(0,Qt::Unchecked);
                 }
+                group_control_pos_rights->setExpanded(true);
+                group_dynamic_view_rights->setExpanded(true);
+                group_patients_rights->setExpanded(true);
             }
         }
     }
 }
+void MainWindow::save_user_right()
+{
+    QTreeWidgetItemIterator it(ui->treeWidget);
+    QString id_user;
+    QString add_patients;
+    QString edit_patients;
+    QString del_patients;
+    QString add_dynamic_view;
+    QString edit_dynamic_view;
+    QString del_dynamic_view;
+    QString add_control_pos;
+    QString edit_control_pos;
+    QString del_control_pos;
+    QString add_today_control_pos;
+    ui->pushButton_add_right->setEnabled(false);
+    ++it;
+    if((*it)->checkState(0)==Qt::Checked)
+    {
+        add_patients="true";
+    }
+    else
+    {
+        add_patients="false";
+    }
+    ++it;
+    if((*it)->checkState(0)==Qt::Checked)
+    {
+        edit_patients="true";
+    }
+    else
+    {
+        edit_patients="false";
+    }
+    ++it;
+    if((*it)->checkState(0)==Qt::Checked)
+    {
+        del_patients="true";
+    }
+    else
+    {
+        del_patients="false";
+    }
+    ++it;
+    ++it;
+    if((*it)->checkState(0)==Qt::Checked)
+    {
+        add_dynamic_view="true";
+    }
+    else
+    {
+        add_dynamic_view="false";
+    }
+    ++it;
+    if((*it)->checkState(0)==Qt::Checked)
+    {
+        edit_dynamic_view="true";
+    }
+    else
+    {
+        edit_dynamic_view="false";
+    }
+    ++it;
+    if((*it)->checkState(0)==Qt::Checked)
+    {
+        del_dynamic_view="true";
+    }
+    else
+    {
+        del_dynamic_view="false";
+    }
+    ++it;
+    ++it;
+    if((*it)->checkState(0)==Qt::Checked)
+    {
+        add_control_pos="true";
+    }
+    else
+    {
+        add_control_pos="false";
+    }
+    ++it;
+    if((*it)->checkState(0)==Qt::Checked)
+    {
+        edit_control_pos="true";
+    }
+    else
+    {
+        edit_control_pos="false";
+    }
+    ++it;
+    if((*it)->checkState(0)==Qt::Checked)
+    {
+        del_control_pos="true";
+    }
+    else
+    {
+        del_control_pos="false";
+    }
+    ++it;
+    if((*it)->checkState(0)==Qt::Checked)
+    {
+        add_today_control_pos="true";
+    }
+    else
+    {
+        add_today_control_pos="false";
+    }
+
+    QSqlDatabase db = QSqlDatabase::database();
+    QSqlQuery query;
+    int selected_tables = ui->tableWidget_role->selectionModel()->selectedRows().count();
+    if (selected_tables == 1)
+    {
+        int cu_row = ui->tableWidget_role->currentRow();
+        id_user = ui->tableWidget_role->item(cu_row,0)->text();
+
+        QString str_query = "UPDATE test.rights\
+                SET insert_patients=" + add_patients + ", delete_patients=" + del_patients + ", update_patients=" + edit_patients + ", add_dynamic_view=" + add_dynamic_view + ", edit_dynamic_view=" + edit_dynamic_view + ",\
+                    del_dynamic_view=" + del_dynamic_view + ", add_visits="+ add_control_pos+ ", edit_visits="+ edit_control_pos+ ", del_visits="+ del_control_pos+ ",\
+                    add_today_visits="+ add_today_control_pos +"\
+              WHERE  user_id="+id_user;
+        qDebug()<<str_query;
+        if (db.open())
+        {
+            query.exec(str_query);
+        }
+    }
+    get_user_right();
+
+}
+
 void MainWindow::clear_users_table()
 {
     int c =0;
